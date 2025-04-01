@@ -2,22 +2,24 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use bevy::asset::AssetMetaCheck;
-use bevy::prelude::*;
+use bevy::log::LogPlugin;
+use bevy::{log, prelude::*};
 use bevy::window::PrimaryWindow;
 use bevy::winit::WinitWindows;
 use bevy::DefaultPlugins;
-use bevy_game::GamePlugin; // ToDo: Replace bevy_game with your new crate name.
+use bevy_console::{make_layer, ConsolePlugin};
+use bevy_project_1::GamePlugin;
 use std::io::Cursor;
 use winit::window::Icon;
 
 fn main() {
     App::new()
-        .insert_resource(ClearColor(Color::linear_rgb(0.4, 0.4, 0.4)))
+        .insert_resource(ClearColor(Color::linear_rgb(0.1, 0.1, 0.1)))
         .add_plugins(
             DefaultPlugins
                 .set(WindowPlugin {
                     primary_window: Some(Window {
-                        title: "Bevy game".to_string(), // ToDo
+                        title: "Bevy Project 1".to_string(),
                         // Bind to canvas included in `index.html`
                         canvas: Some("#bevy".to_owned()),
                         fit_canvas_to_parent: true,
@@ -30,8 +32,14 @@ fn main() {
                 .set(AssetPlugin {
                     meta_check: AssetMetaCheck::Never,
                     ..default()
+                })
+                .set(LogPlugin {
+                    level: log::Level::INFO,
+                    filter: "error,capture_bevy_logs=info".to_owned(),
+                    custom_layer: make_layer,
                 }),
         )
+        .add_plugins(ConsolePlugin)
         .add_plugins(GamePlugin)
         .add_systems(Startup, set_window_icon)
         .run();
